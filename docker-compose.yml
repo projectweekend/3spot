@@ -1,13 +1,13 @@
-db:
-    image: mongo
-    ports:
-        - 27017
+# db:
+#     image: mongo
+#     ports:
+#         - 27017
 worker:
     build: .
     command: python main.py -c test_config.yml
     volumes:
         - .:/src
-    links:
-        - db
+    # links:
+    #     - db
     environment:
         TESTING:
