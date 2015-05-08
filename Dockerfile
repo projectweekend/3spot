@@ -3,4 +3,4 @@ COPY requirements.txt /src/
 COPY main.py /src/
 WORKDIR /src
 RUN pip install ipython && pip install -r requirements.txt
-ENTRYPOINT ["python"]
+# ENTRYPOINT ["python"]
