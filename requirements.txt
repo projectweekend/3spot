@@ -1,2 +1,2 @@
-spotipy==2.3.5
-PyYAML==3.11
+boto==2.38.0
+spotipy==2.3.4
