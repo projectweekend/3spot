@@ -1,6 +1,6 @@
 from datetime import date
 import spotipy
-from spotify import PlaylistEntry
+from spotify import Playlist, PlaylistEntry
 
 
 class Account(object):
@@ -11,25 +11,31 @@ class Account(object):
         self._refresh_token = refresh_token
         self._client = spotipy.Spotify(auth=self._access_token)
 
-    def playlist_entries(self, playlist_id):
-        offset = 0
-        result = self._client.user_playlist_tracks(self._username, playlist_id)
-        items = result['items']
-        next = result['next']
-        while next:
-            offset += 50
-            result = self._client.user_playlist_tracks(
-                user=self._username,
-                playlist_id=playlist_id,
-                offset=offset)
-            items.extend(result['items'])
-            next = result['next']
-        return [PlaylistEntry(**i) for i in items]
+    def playlist(self, playlist_id):
+        result = self._client.user_playlist(
+            self._username,
+            playlist_id,
+            fields="name,external_urls")
+        return Playlist(**result)
 
     def todays_track(self, playlist_id):
-        def added_today(entry):
+        def was_added_today(entry):
             return date.isoformat(date.today()) == date.isoformat(entry.added_date)
-        try:
-            return filter(added_today, self.playlist_entries(playlist_id))[0]
-        except IndexError:
-            return None
+
+        offset = 0
+        todays_track = None
+        while True:
+            result = self._client.user_playlist_tracks(
+                self._username,
+                playlist_id,
+                offset=offset)
+            entries = [PlaylistEntry(**i) for i in result['items']]
+            try:
+                todays_track = filter(was_added_today, entries)[0]
+                break
+            except IndexError:
+                if result['next']:
+                    offset += 50
+                else:
+                    break
+        return todays_track
