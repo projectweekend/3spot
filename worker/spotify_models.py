@@ -15,7 +15,7 @@ class Artist(SpotifyItem):
         super(Artist, self).__init__(**entries)
 
     def __repr__(self):
-        return 'Artist: {0}'.format(self.name)
+        return '<Artist: {0}>'.format(self.name)
 
 
 class Album(SpotifyItem):
@@ -24,7 +24,7 @@ class Album(SpotifyItem):
         super(Album, self).__init__(**entries)
 
     def __repr__(self):
-        return 'Album: {0}'.format(self.name)
+        return '<Album: {0}>'.format(self.name)
 
 
 class Track(SpotifyItem):
@@ -35,7 +35,7 @@ class Track(SpotifyItem):
         self.artists = [Artist(**a) for a in self.artists]
 
     def __repr__(self):
-        return 'Track: {0}'.format(self.name)
+        return '<Track: {0}>'.format(self.name)
 
 
 class Playlist(SpotifyItem):
@@ -46,7 +46,7 @@ class Playlist(SpotifyItem):
         del self.external_urls
 
     def __repr__(self):
-        return 'Playlist: {0}'.format(self.name)
+        return '<Playlist: {0}>'.format(self.name)
 
 
 class PlaylistEntry(SpotifyItem):
@@ -58,4 +58,4 @@ class PlaylistEntry(SpotifyItem):
         self.added_date = self.added_at.date()
 
     def __repr__(self):
-        return 'PlaylistEntry: {0}'.format(self.track.name)
+        return '<PlaylistEntry: {0}>'.format(self.track.name)
