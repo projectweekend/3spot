@@ -7,20 +7,18 @@ from spotify_api import new_access_token
 
 class Account(object):
 
-    def __init__(self, username, playlist_id):
+    def __init__(self, username):
         self._username = username
-        self._playlist_id = playlist_id
         self._model = self._database_model()
         self._spotify = self._spotify_client()
 
     def __repr__(self):
-        return "<Account: {0} - {1}>".format(self._username, self._playlist_id)
+        return "<Account: {0} - {1}>".format(self._username, self._model['spotify_playlist_id'])
 
     def _database_model(self):
         accounts = Table('accounts')
         return accounts.get_item(
-            spotify_username=self._username,
-            spotify_playlist_id=self._playlist_id)
+            spotify_username=self._username)
 
     def _spotify_client(self):
         self._refresh_access_token()
