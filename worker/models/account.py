@@ -1,8 +1,8 @@
 from datetime import date
 import spotipy
 from boto.dynamodb2.table import Table
-from spotify_models import Playlist, PlaylistEntry
-from spotify_api import new_access_token
+from worker.spotify.api import new_access_token
+from spotify_playlist import Playlist, PlaylistEntry
 
 
 class Account(object):
