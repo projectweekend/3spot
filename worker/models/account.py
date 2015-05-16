@@ -35,7 +35,7 @@ class Account(object):
             fields="name,external_urls")
         return Playlist(**result)
 
-    def todays_track(self):
+    def todays_playlist_entry(self):
         def was_added_today(entry):
             return date.isoformat(date.today()) == date.isoformat(entry.added_date)
 

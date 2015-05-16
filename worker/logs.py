@@ -1,13 +1,10 @@
-import os
 import logging
 import logging.handlers
-
-
-PROD_LOGGER = os.getenv('PROD_LOGGER', False)
+import config
 
 
 def get_logger():
-    if PROD_LOGGER:
+    if config.PROD_LOGGER:
         logger = logging.getLogger('song-feed-worker')
         logger.setLevel(logging.ERROR)
         handler = logging.handlers.SysLogHandler('/dev/log')
