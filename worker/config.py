@@ -3,7 +3,7 @@ import os
 
 SQS_WAIT_TIME = os.getenv('SQS_WAIT_TIME', 20)
 
-SLEEP_TIME = os.getenv('SLEEP_TIME', 20)
+SLEEP_TIME = os.getenv('SLEEP_TIME', 60)
 
 PROD_LOGGER = os.getenv('PROD_LOGGER', False)
 
