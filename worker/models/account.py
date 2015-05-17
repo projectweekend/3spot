@@ -2,6 +2,7 @@ from datetime import date
 from datetime import datetime
 import spotipy
 from boto.dynamodb2.table import Table
+from boto.dynamodb2.exceptions import ConditionalCheckFailedException
 from worker.spotify.api import new_access_token
 from spotify_playlist import Playlist, PlaylistEntry
 
@@ -61,10 +62,10 @@ class Account(object):
             fields="name,external_urls")
         return Playlist(**result)
 
-    def todays_playlist_entry(self):
+    def playlist_entry(self, target_date=date.today()):
         def was_added_today(item):
             added_at = datetime.strptime(item['added_at'], '%Y-%m-%dT%H:%M:%SZ')
-            return date.isoformat(date.today()) == date.isoformat(added_at.date())
+            return date.isoformat(target_date) == date.isoformat(added_at.date())
 
         offset = 0
         todays_track = None
@@ -84,16 +85,19 @@ class Account(object):
                     break
         return todays_track
 
-    def add_feed_item(self):
-        playlist_entry = self.todays_playlist_entry()
+    def add_feed_item(self, target_date=date.today()):
+        playlist_entry = self.playlist_entry(target_date=target_date)
         if playlist_entry:
             date_posted = date.isoformat(playlist_entry.added_date)
             content = self._content_for_feed_item(playlist_entry.track)
             feed_items = Table('feed_items')
-            feed_items.put_item(data={
-                'spotify_username': self._username,
-                'date_posted': date_posted,
-                'content': content
-            })
-            return True
+            try:
+                feed_items.put_item(data={
+                    'spotify_username': self._username,
+                    'date_posted': date_posted,
+                    'content': content
+                })
+                return True
+            except ConditionalCheckFailedException:
+                return False
         return False
