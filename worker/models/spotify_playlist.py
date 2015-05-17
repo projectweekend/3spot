@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import date
 from spotify_item import SpotifyItem
 from spotify_track import Track
 
@@ -24,3 +25,9 @@ class PlaylistEntry(SpotifyItem):
 
     def __repr__(self):
         return '<PlaylistEntry: {0}>'.format(self.track.name)
+
+    def feed_item(self):
+        return {
+            'date_posted': date.isoformat(self.added_date),
+            'content': self.track.export_feed_item()
+        }

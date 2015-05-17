@@ -12,3 +12,11 @@ class Track(SpotifyItem):
 
     def __repr__(self):
         return '<Track: {0}>'.format(self.name)
+
+    def export_feed_item(self):
+        return {
+            'uri': self.uri,
+            'name': self.name,
+            'album': self.album.export_feed_item(),
+            'artists': [a.export_feed_item() for a in self.artists]
+        }

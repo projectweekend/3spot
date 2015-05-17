@@ -2,7 +2,6 @@ from datetime import date
 from datetime import datetime
 import spotipy
 from boto.dynamodb2.table import Table
-from boto.dynamodb2.exceptions import ConditionalCheckFailedException
 from worker.spotify.api import new_access_token
 from spotify_playlist import Playlist, PlaylistEntry
 
@@ -30,45 +29,13 @@ class Account(object):
         self._model['access_token'] = new_access_token(self._model['refresh_token'])
         self._model.save()
 
-    def _content_for_feed_item(self, track):
-        def artist(a):
-            return {
-                'uri': a.uri,
-                'name': a.name,
-                'bio': {
-                    'lastfm': a.bio_from_lastfm,
-                    'wikipedia': a.bio_from_wikipedia
-                },
-                'images': a.images,
-                'terms': a.popular_terms
-            }
-        return {
-            'track': {
-                'uri': track.uri,
-                'name': track.name
-            },
-            'album': {
-                'uri': track.album.uri,
-                'name': track.album.name,
-                'images': track.album.images
-            },
-            'artists': [artist(a) for a in track.artists]
-        }
-
-    def playlist(self):
-        result = self._spotify.user_playlist(
-            self._username,
-            self._model['spotify_playlist_id'],
-            fields="name,external_urls")
-        return Playlist(**result)
-
     def playlist_entry(self, target_date=date.today()):
         def was_added_today(item):
             added_at = datetime.strptime(item['added_at'], '%Y-%m-%dT%H:%M:%SZ')
             return date.isoformat(target_date) == date.isoformat(added_at.date())
 
         offset = 0
-        todays_track = None
+        entry = None
         while True:
             result = self._spotify.user_playlist_tracks(
                 self._username,
@@ -76,28 +43,19 @@ class Account(object):
                 offset=offset)
             try:
                 item = filter(was_added_today, result['items'])[0]
-                todays_track = PlaylistEntry(**item)
+                entry = PlaylistEntry(**item)
                 break
             except IndexError:
                 if result['next']:
                     offset += 50
                 else:
                     break
-        return todays_track
+        return entry
 
-    def add_feed_item(self, target_date=date.today()):
+    def feed_item(self, target_date=date.today()):
         playlist_entry = self.playlist_entry(target_date=target_date)
+        feed_item = None
         if playlist_entry:
-            date_posted = date.isoformat(playlist_entry.added_date)
-            content = self._content_for_feed_item(playlist_entry.track)
-            feed_items = Table('feed_items')
-            try:
-                feed_items.put_item(data={
-                    'spotify_username': self._username,
-                    'date_posted': date_posted,
-                    'content': content
-                })
-                return True
-            except ConditionalCheckFailedException:
-                return False
-        return False
+            feed_item = {'spotify_username': self._username}
+            feed_item.update(playlist_entry.feed_item())
+        return feed_item
