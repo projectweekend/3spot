@@ -9,7 +9,7 @@ class Album(SpotifyItem):
     def __repr__(self):
         return '<Album: {0}>'.format(self.name)
 
-    def export_feed_item(self):
+    def export_for_feed(self):
         return {
             'uri': self.uri,
             'name': self.name,

@@ -29,5 +29,7 @@ class PlaylistEntry(SpotifyItem):
     def feed_item(self):
         return {
             'date_posted': date.isoformat(self.added_date),
-            'content': self.track.export_feed_item()
+            'track': self.track.export_for_feed(),
+            'album': self.track.album.export_for_feed(),
+            'artists': [a.export_for_feed() for a in self.track.artists]
         }

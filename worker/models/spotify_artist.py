@@ -49,7 +49,7 @@ class Artist(SpotifyItem):
 
         return filter(above_min_weight, self._echonest.terms)
 
-    def export_feed_item(self):
+    def export_for_feed(self):
         return {
             'uri': self.uri,
             'name': self.name,
