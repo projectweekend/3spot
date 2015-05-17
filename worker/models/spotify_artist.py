@@ -47,4 +47,4 @@ class Artist(SpotifyItem):
         def above_min_weight(item):
             return item['weight'] >= min_weight
 
-        return filter(above_min_weight, self._echonest.terms)
+        return [p['name'] for p in filter(above_min_weight, self._echonest.terms)]
