@@ -4,17 +4,6 @@ from spotify_item import SpotifyItem
 from spotify_track import Track
 
 
-class Playlist(SpotifyItem):
-
-    def __init__(self, **entries):
-        super(Playlist, self).__init__(**entries)
-        self.url = self.external_urls['spotify']
-        del self.external_urls
-
-    def __repr__(self):
-        return '<Playlist: {0}>'.format(self.name)
-
-
 class PlaylistEntry(SpotifyItem):
 
     def __init__(self, **entries):
